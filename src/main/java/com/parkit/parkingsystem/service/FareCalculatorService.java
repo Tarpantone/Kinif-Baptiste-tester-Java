@@ -3,6 +3,9 @@ package com.parkit.parkingsystem.service;
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.model.Ticket;
 
+
+
+
 public class FareCalculatorService {
 
     public void calculateFare(Ticket ticket){
@@ -10,11 +13,11 @@ public class FareCalculatorService {
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
         }
 
-        int inHour = ticket.getInTime().getHours();
-        int outHour = ticket.getOutTime().getHours();
+        Long inTime= Long.valueOf(ticket.getInTime().getTime());
+        Long outTime= Long.valueOf(ticket.getOutTime().getTime());
+        Long timeBetween= new Long(outTime-inTime);
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
-        int duration = outHour - inHour;
+        double duration = timeBetween.doubleValue()/3600000;
 
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
