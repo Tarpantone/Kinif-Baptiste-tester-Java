@@ -5,7 +5,6 @@ import com.parkit.parkingsystem.model.Ticket;
 
 
 
-
 public class FareCalculatorService {
 
     public void calculateFare(Ticket ticket){
@@ -20,8 +19,30 @@ public class FareCalculatorService {
         double duration = timeBetween.doubleValue()/3600000;
 
         if (duration<=0.5){
+
             ticket.setPrice(0.00);
+
+        }else if(ticket.getDiscount()){
+            double price;
+            switch (ticket.getParkingSpot().getParkingType()){
+                case CAR: {
+                    price=duration * Fare.CAR_RATE_PER_HOUR*0.95;
+                    price=Math.round(price*100.00)/100.00;
+                    ticket.setPrice(price);
+                    break;
+                }
+                case BIKE: {
+                    price=duration * Fare.BIKE_RATE_PER_HOUR*0.95;
+                    price=Math.round(price*100.00)/100.00;
+                    ticket.setPrice(price);
+                    break;
+                }
+                default:
+                    throw new IllegalArgumentException("Unkown Parking Type");
+            }
+
         }else {
+
             switch (ticket.getParkingSpot().getParkingType()) {
                 case CAR: {
                     ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
