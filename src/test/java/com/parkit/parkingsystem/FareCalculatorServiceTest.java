@@ -163,8 +163,7 @@ public class FareCalculatorServiceTest {
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
-        ticket.setDiscount(discount);
-        fareCalculatorService.calculateFare(ticket);
+        fareCalculatorService.calculateFare(ticket,discount);
         assertEquals( 1.42, ticket.getPrice());
     }
 
@@ -179,8 +178,7 @@ public class FareCalculatorServiceTest {
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
-        ticket.setDiscount(discount);
-        fareCalculatorService.calculateFare(ticket);
+        fareCalculatorService.calculateFare(ticket,discount);
         assertEquals( 0.95, ticket.getPrice());
     }
 
