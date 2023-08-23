@@ -19,6 +19,62 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
+    public boolean saveTestTicket(Ticket ticket){
+        Connection con=null;
+        try {
+            con=dataBaseConfig.getConnection();
+            PreparedStatement ps= con.prepareStatement(DBConstants.SAVE_TICKET);
+            ps.setInt(1,ticket.getId());
+            ps.setInt(2,ticket.getParkingSpot().getId());
+            ps.setString(3, ticket.getVehicleRegNumber());
+            ps.setDouble(4, ticket.getPrice());
+            ps.setTimestamp(5, new Timestamp(ticket.getInTime().getTime()));
+            ps.setTimestamp(6, new Timestamp(ticket.getOutTime().getTime()));
+            return ps.execute();
+        }catch (Exception ex){
+            logger.error("Error Saving Test Ticket",ex);
+            return false;
+        }finally {
+            dataBaseConfig.closeConnection(con);
+        }
+    }
+
+    public boolean UpdateIntimeTestTicket(Ticket ticket){
+        Connection con = null;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.UPDATE_TEST_IN_TIME);
+            ps.setTimestamp(1, new Timestamp(ticket.getInTime().getTime()));
+            ps.setInt(2, ticket.getId());
+            ps.execute();
+            return true;
+        }catch (Exception ex){
+            logger.error("Error updating in time ticket info",ex);
+            return false;
+        }finally {
+            dataBaseConfig.closeConnection(con);
+        }
+    }
+
+    public int getNextAvailableTicketID(){
+        Connection con=null;
+        int result=0;
+        try{
+            con= dataBaseConfig.getConnection();
+            PreparedStatement ps= con.prepareStatement(DBConstants.TOTAL_NB_TICKET);
+            ResultSet rs=ps.executeQuery();
+            rs.next();
+            result=rs.getInt("result");
+        }
+        catch(Exception ex){
+            logger.error("Error counting number of ticket for this vehicle",ex);
+        }finally{
+            dataBaseConfig.closeConnection(con);
+        }
+        return result;
+    }
+
+
     public boolean saveTicket(Ticket ticket){
         Connection con = null;
         try {
@@ -95,7 +151,8 @@ public class TicketDAO {
             PreparedStatement ps= con.prepareStatement(DBConstants.NUMBER_TICKET);
             ps.setString(1,vehicleRegNumber);
             ResultSet rs=ps.executeQuery();
-            while (rs.next()){result++;}
+            rs.next();
+            result=rs.getInt("result");
         }
         catch(Exception ex){
             logger.error("Error counting number of ticket for this vehicle",ex);
