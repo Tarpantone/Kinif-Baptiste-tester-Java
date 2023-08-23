@@ -38,44 +38,57 @@ public class ParkingDataBaseIT {
         dataBasePrepareService = new DataBasePrepareService();
     }
 
-    @BeforeEach
-    public void setUpPerTest() throws Exception {
-        when(inputReaderUtil.readSelection()).thenReturn(1);
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+    /* @BeforeEach
+   public void setUpPerTest() throws Exception {
         dataBasePrepareService.clearDataBaseEntries();
-    }
+    }*/
 
     @AfterAll
     public static void tearDown(){
 
     }
 
-    @Test
-    public void testParkingACar(){
+   @Test
+    public void testParkingACar() throws Exception {
+
+        when(inputReaderUtil.readSelection()).thenReturn(1);
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("INCOMING");
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
         parkingService.processIncomingVehicle();
 
-        String vehicleRegNumber="ABCDEF";
+        String vehicleRegNumber="INCOMING";
         Ticket result = ticketDAO.getTicket(vehicleRegNumber);
         boolean expected1 = true;
         boolean expected2=false;
 
         assertEquals(expected1,result!=null);
         assertEquals(expected2,result.getParkingSpot().isAvailable());
-
-
-        //TODO: check that a ticket is actualy saved in DB and Parking table is updated with availability
-
-
     }
 
     @Test
-    public void testParkingLotExit(){
-        testParkingACar();
+    public void testParkingLotExit() throws Exception {
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("EXIT");
+        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
+        parkingService.processExitingVehicle();
+
+        String vehicleRegNumber="EXIT";
+        Ticket result= ticketDAO.getTicket(vehicleRegNumber);
+
+        boolean expected1=true;
+        boolean expected2=true;
+        //TODO: check that the fare generated and out time are populated correctly in the database
+        assertEquals(expected1, result.getPrice()!=0.00);
+        assertEquals(expected2, result.getOutTime()!=null);
+    }
+
+    @Test
+    public void testParkingLotExitRecurringUser() throws Exception {
+
+        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("REGULAR");
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processExitingVehicle();
-        //TODO: check that the fare generated and out time are populated correctly in the database
     }
 
 }
